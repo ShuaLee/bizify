@@ -6,3 +6,9 @@ from django.db import models
 class Company(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
