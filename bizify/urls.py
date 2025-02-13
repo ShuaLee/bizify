@@ -22,6 +22,6 @@ admin.site.site_header = "Bizify Admin"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('company/', include('company.urls')),
+    path('company/', include('organization.urls')),
     path('__debug__/', include(debug_toolbar.urls))
 ]
