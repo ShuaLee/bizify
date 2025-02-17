@@ -1,7 +1,8 @@
 from rest_framework import serializers
+from .models import Company
 
 
-class CompanySerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField(max_length=150)
-    description = serializers.CharField()
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['id', 'name', 'description']
