@@ -19,11 +19,17 @@ def company_list(request):
         serializer = CompanySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response('ok')
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@api_view()
+@api_view(['GET', 'PUT'])
 def company_description(request, id):
     company = get_object_or_404(Company, pk=id)
-    serializer = CompanySerializer(company)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        serializer = CompanySerializer(company)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CompanySerializer(company, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
