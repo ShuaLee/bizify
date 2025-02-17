@@ -9,11 +9,17 @@ from .serializers import CompanySerializer
 # Create your views here.
 
 
-@api_view()
+@api_view(['GET', 'POST'])
 def company_list(request):
-    queryset = Company.objects.all()
-    serializer = CompanySerializer(queryset, many=True)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        queryset = Company.objects.all()
+        serializer = CompanySerializer(queryset, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = CompanySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data
+        return Response('ok')
 
 
 @api_view()
