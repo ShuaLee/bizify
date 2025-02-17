@@ -22,7 +22,7 @@ def company_list(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def company_description(request, id):
     company = get_object_or_404(Company, pk=id)
     if request.method == 'GET':
@@ -33,3 +33,6 @@ def company_description(request, id):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+    elif request.method == 'DELETE':
+        company.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
