@@ -18,7 +18,7 @@ def company_list(request):
     elif request.method == 'POST':
         serializer = CompanySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.validated_data
+        serializer.save()
         return Response('ok')
 
 
