@@ -3,8 +3,10 @@ from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Company
-from .serializers import CompanySerializer
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.viewsets import GenericViewSet
+from .models import Company, Profile
+from .serializers import CompanySerializer, ProfileSerializer
 
 # Create your views here.
 
@@ -36,3 +38,8 @@ def company_description(request, id):
     elif request.method == 'DELETE':
         company.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProfileViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
