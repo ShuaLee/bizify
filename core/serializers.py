@@ -1,7 +1,8 @@
+from django.conf import settings
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
 
 
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
-        fields = ['id', 'username', 'password',
-                  'email', 'first_name', 'last_name']
+        model = settings.AUTH_USER_MODEL
+        fields = ['id', 'email', 'password', 'first_name', 'last_name']

@@ -149,6 +149,8 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'core.User'
 
 DJOSER = {
+    'USER_ID_FIELD': 'email',
+    'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer'
     }
