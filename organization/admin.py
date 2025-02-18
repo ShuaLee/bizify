@@ -7,6 +7,7 @@ from . import models
 @admin.register(models.Company)  # This registers the model.
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ['name', 'description']
+    filter_horizontal = ['members']
 
 
 @admin.register(models.Profile)
