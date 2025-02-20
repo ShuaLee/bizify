@@ -23,10 +23,11 @@ class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f'{self.user.first_name} {self.user.last_name}'
+    class Meta:
+        ordering = ['user__first_name', 'user__last_name']
 
     # Signal to automatically create a Profile when a User is created
+
     @receiver(post_save, sender=settings.AUTH_USER_MODEL)
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
@@ -36,5 +37,6 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
-    class Meta:
-        ordering = ['user__first_name', 'user__last_name']
+    # Magic methods
+    def __str__(self):
+        return f'{self.user.first_name} {self.user.last_name}'
