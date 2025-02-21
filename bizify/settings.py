@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'djoser',
-    'organization',
+    'organization.apps.OrganizationConfig',
     'debug_toolbar',
     'core',
 ]
