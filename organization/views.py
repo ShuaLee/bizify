@@ -6,6 +6,7 @@ from .serializers import ProfileSerializer
 # Create your views here.
 
 
-class ProfileViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
-    queryset = Profile.objects.all()
+class ProfileViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    # STILL NEED TO ADD AUTHENTICATION
     serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
