@@ -6,25 +6,19 @@ from django.db.models.signals import post_save
 # Create your models here.
 
 
-class Company(models.Model):
-    name = models.CharField(max_length=150)
-    description = models.TextField()
-    members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name='companies', blank=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['name']
-
-
 class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15, blank=True)
+    country = models.CharField(max_length=30, blank=True)
+    state = models.CharField(max_length=30, blank=True)
+    city = models.CharField(max_length=30, blank=True)
+    postal_code = models.CharField(max_length=15, blank=True)
+    address = models.CharField(max_length=100, blank=True)
 
-    class Meta:
-        ordering = ['user__first_name', 'user__last_name']
+    # Magic methods
+    def __str__(self):
+        return self.user.email
 
     # Signal to automatically create a Profile when a User is created
 
@@ -36,7 +30,3 @@ class Profile(models.Model):
     @receiver(post_save, sender=settings.AUTH_USER_MODEL)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
-
-    # Magic methods
-    def __str__(self):
-        return f'{self.user.first_name} {self.user.last_name}'
