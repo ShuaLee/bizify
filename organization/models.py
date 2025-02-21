@@ -12,7 +12,7 @@ class Profile(models.Model):
     state = models.CharField(max_length=30, blank=True)
     city = models.CharField(max_length=30, blank=True)
     postal_code = models.CharField(max_length=15, blank=True)
-    address = models.CharField(max_length=100, blank=True)
+    job_title = models.CharField(max_length=50, blank=True)
 
     # Magic methods
     def __str__(self):
