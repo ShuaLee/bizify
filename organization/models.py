@@ -17,3 +17,17 @@ class Profile(models.Model):
     # Magic methods
     def __str__(self):
         return self.user.email
+
+
+class Company(models.Model):
+    name = models.CharField(max_length=150)
+    admins = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='admin_companies',
+        blank=True
+    )
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
