@@ -22,12 +22,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    profile_count = serializers.SerializerMethodField()
+    profiles = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
-        fields = ['id', 'name', 'description', 'profile_count']
+        fields = ['id', 'name', 'description', 'profiles']
 
-    def get_profile_count(self, obj):
-        # Count profiles linked to this company via ProfileCompanyRole
-        return obj.members.count()
+    def get_profiles(self, obj):
+        # Fetch profiles linked to the company via ProfileCompanyRole
+        profiles = obj.members.all()
+        return [{'id': profile.id, 'email': profile.user.email} for profile in profiles]
