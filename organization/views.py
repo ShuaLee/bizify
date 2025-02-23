@@ -1,4 +1,4 @@
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from .models import Profile, Company, Role, ProfileCompanyRole
 from .serializers import ProfileSerializer, CompanySerializer
@@ -6,13 +6,16 @@ from .serializers import ProfileSerializer, CompanySerializer
 # Create your views here.
 
 
-class ProfileViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
-    # STILL NEED TO ADD AUTHENTICATION
+class ProfileViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
 
+    # Refine with AUTH later:
+    # def get_queryset(self):
+    #   return Profile.objects.filter(user=self.request.user)
 
-class CompanyViewSet(ModelViewSet):
+
+class CompanyViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     # No permission_classes = [isAuthenticated] for now
