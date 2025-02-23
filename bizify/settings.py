@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'organization.apps.OrganizationConfig',
+    'inventory.apps.InventoryConfig',
     'debug_toolbar',
     'core',
 ]
