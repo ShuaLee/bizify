@@ -4,11 +4,19 @@ from . import models
 # Register your models here.
 
 
+class ProfileCompanyRoleInline(admin.TabularInline):
+    model = models.ProfileCompanyRole
+    extra = 1  # Number of empty rows to add by default
+    fields = ('profile', 'company', 'role')
+
+
 @admin.register(models.Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'phone_number', 'company_list', 'role_list']
     search_fields = ('user__email', 'phone_number')
     list_filter = ('companies',)  # Filter by companies
+    readonly_fields = ['company_list', 'role_list']  # Add to detail page
+    inlines = [ProfileCompanyRoleInline]
 
     def company_list(self, obj):
         # Display all companies as a comma-separated string
@@ -17,17 +25,26 @@ class ProfileAdmin(admin.ModelAdmin):
     company_list.short_description = 'Companies'
 
     def role_list(self, obj):
-        # Display roles from ProfileCompanyRole
+        # Display roles and their associated companies from ProfileCompanyRole
         profile_roles = models.ProfileCompanyRole.objects.filter(profile=obj)
-        return ", ".join(str(profile_role.role) if profile_role.role else "No Role" for profile_role in profile_roles) if profile_roles else "None"
+        return ", ".join(
+            f"{profile_role.role.name} ({profile_role.company.name})"
+            if profile_role.role else f"No Role ({profile_role.company.name})"
+            for profile_role in profile_roles
+        ) if profile_roles else "None"
     role_list.short_description = 'Roles'
 
 
 @admin.register(models.Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'created_at']
+    list_display = ['name', 'created_at', 'profile_count']
     list_filter = ['created_at',]
     search_fields = ['name', 'description']
+    inlines = [ProfileCompanyRoleInline]
+
+    def profile_count(self, obj):
+        return obj.members.count()
+    profile_count.short_description = 'Number of Profiles'
 
 
 @admin.register(models.Role)
