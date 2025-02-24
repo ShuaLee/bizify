@@ -15,7 +15,7 @@ class Inventory(models.Model):
 
 
 class Item(models.Model):
-    Inventory = models.ForeignKey(
+    inventory = models.ForeignKey(
         Inventory, on_delete=models.CASCADE, related_name='items')
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True)
@@ -28,13 +28,21 @@ class Item(models.Model):
 
 
 class ItemDetail(models.Model):
+    VALUE_TYPES = (
+        ('text', 'Text'),
+        ('number', 'Number'),
+        ('url', 'URL'),
+        ('bool', 'Boolean'),
+    )
+
     item = models.ForeignKey(
         Item, on_delete=models.CASCADE, related_name='details')
     key = models.CharField(max_length=50)
     value = models.CharField(max_length=255, blank=True)
+    type = models.CharField(max_length=10, choices=VALUE_TYPES, default='text')
 
     def __str__(self):
-        return f"{self.key}: {self.value} ({self.item.name})"
+        return f"{self.key}: {self.value} ({self.type}) - {self.item.name}"
 
     class Meta:
         unique_together = ('item', 'key')  # One value per key per item
