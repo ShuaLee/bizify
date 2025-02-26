@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from .models import Inventory, Item, ItemDetail
-from .serializers import InventorySerializer, ItemSerializer, ItemDetailSerializer
+from .models import Inventory, Item, ItemDetail, InventorySetting
+from .serializers import InventorySerializer, ItemSerializer, ItemDetailSerializer, InventorySettingSerializer
 
 # Create your views here.
 
@@ -19,3 +19,8 @@ class ItemViewSet(ModelViewSet):
 class ItemDetailViewSet(ModelViewSet):
     queryset = ItemDetail.objects.all()
     serializer_class = ItemDetailSerializer
+
+
+class InventorySettingViewSet(ModelViewSet):
+    queryset = InventorySetting.objects.all()
+    serializer_class = InventorySettingSerializer

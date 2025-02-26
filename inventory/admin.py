@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Inventory, ItemDetail, Item
+from .models import Inventory, ItemDetail, Item, InventorySetting
 
 # Register your models here.
 
@@ -11,6 +11,11 @@ class ItemDetailInline(admin.TabularInline):
 
 class ItemInline(admin.TabularInline):
     model = Item
+    extra = 1
+
+
+class InventorySettingInline(admin.TabularInline):
+    model = InventorySetting
     extra = 1
 
 
@@ -34,3 +39,10 @@ class ItemDetailAdmin(admin.ModelAdmin):
     list_display = ('item', 'key', 'value')
     # list_filter = ('item__inventory__company',)
     search_fields = ('key', 'value')
+
+
+@admin.register(InventorySetting)
+class InventorySettingAdmin(admin.ModelAdmin):
+    list_display = ('inventory', 'key', 'type', 'allow_multiple')
+    list_filter = ('inventory__company',)
+    search_fields = ('key',)

@@ -14,6 +14,28 @@ class Inventory(models.Model):
         return f"{self.name} ({self.company.name})"
 
 
+class InventorySetting(models.Model):
+    VALUE_TYPES = (
+        ('text', 'Text'),
+        ('number', 'Number'),
+        ('url', 'URL'),
+        ('bool', 'Boolean'),
+    )
+
+    inventory = models.ForeignKey(
+        Inventory, on_delete=models.CASCADE, related_name="settings")
+    key = models.CharField(max_length=50)
+    type = models.CharField(max_length=10, choices=VALUE_TYPES, default='text')
+    allow_multiple = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.key} ({self.type}) - {self.inventory.name}"
+
+    class Meta:
+        # One setting per key per inventory
+        unique_together = ('inventory', 'key')
+
+
 class Item(models.Model):
     inventory = models.ForeignKey(
         Inventory, on_delete=models.CASCADE, related_name='items')
@@ -28,21 +50,10 @@ class Item(models.Model):
 
 
 class ItemDetail(models.Model):
-    VALUE_TYPES = (
-        ('text', 'Text'),
-        ('number', 'Number'),
-        ('url', 'URL'),
-        ('bool', 'Boolean'),
-    )
-
     item = models.ForeignKey(
         Item, on_delete=models.CASCADE, related_name='details')
     key = models.CharField(max_length=50)
     value = models.CharField(max_length=255, blank=True)
-    type = models.CharField(max_length=10, choices=VALUE_TYPES, default='text')
 
     def __str__(self):
-        return f"{self.key}: {self.value} ({self.type}) - {self.item.name}"
-
-    class Meta:
-        unique_together = ('item', 'key')  # One value per key per item
+        return f"{self.key}: {self.value} ({self.item.name})"
