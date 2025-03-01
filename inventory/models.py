@@ -52,8 +52,12 @@ class Item(models.Model):
 class ItemDetail(models.Model):
     item = models.ForeignKey(
         Item, on_delete=models.CASCADE, related_name='details')
-    key = models.CharField(max_length=50)
+    setting = models.ForeignKey(
+        InventorySetting, on_delete=models.CASCADE, related_name='item_details')
     value = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return f"{self.key}: {self.value} ({self.item.name})"
+        return f"{self.setting.key}: {self.value} ({self.item.name})"
+
+    class Meta:
+        unique_together = ('item', 'setting')
