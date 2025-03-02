@@ -1,16 +1,15 @@
 from django.contrib import admin
-from . import models
+from .models import Company, ProfileCompanyRole, Profile, Role
+
 
 # Register your models here.
-
-
 class ProfileCompanyRoleInline(admin.TabularInline):
-    model = models.ProfileCompanyRole
+    model = ProfileCompanyRole
     extra = 1  # Number of empty rows to add by default
     fields = ('profile', 'company', 'role')
 
 
-@admin.register(models.Profile)
+@admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'phone_number', 'company_list', 'role_list']
     search_fields = ('user__email', 'phone_number')
@@ -26,7 +25,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
     def role_list(self, obj):
         # Display roles and their associated companies from ProfileCompanyRole
-        profile_roles = models.ProfileCompanyRole.objects.filter(profile=obj)
+        profile_roles = ProfileCompanyRole.objects.filter(profile=obj)
         return ", ".join(
             f"{profile_role.role.name} ({profile_role.company.name})"
             if profile_role.role else f"No Role ({profile_role.company.name})"
@@ -35,7 +34,7 @@ class ProfileAdmin(admin.ModelAdmin):
     role_list.short_description = 'Roles'
 
 
-@admin.register(models.Company)
+@admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ['name', 'created_at', 'profile_count']
     list_filter = ['created_at',]
@@ -47,14 +46,14 @@ class CompanyAdmin(admin.ModelAdmin):
     profile_count.short_description = 'Number of Profiles'
 
 
-@admin.register(models.Role)
+@admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('name', 'company')
     list_filter = ('company',)
     search_fields = ('name',)
 
 
-@admin.register(models.ProfileCompanyRole)
+@admin.register(ProfileCompanyRole)
 class ProfileCompanyRoleAdmin(admin.ModelAdmin):
     list_display = ('profile', 'company', 'role')
     list_filter = ('company', 'role')
@@ -67,13 +66,13 @@ class ProfileCompanyRoleAdmin(admin.ModelAdmin):
                 obj = self.get_object(
                     request, request.resolver_match.kwargs['object_id'])
                 if obj and obj.company:
-                    kwargs['queryset'] = models.Role.objects.filter(
+                    kwargs['queryset'] = Role.objects.filter(
                         company=obj.company)
             # if company is selected int he form (via POST), filter roles by that
             elif request.POST.get('company'):
-                kwargs['queryset'] = models.Role.objects.filter(
+                kwargs['queryset'] = Role.objects.filter(
                     company_id=request.POST['company'])
             else:
                 # No roles until company is picked
-                kwargs['queryset'] = models.Role.objects.none()
+                kwargs['queryset'] = Role.objects.none()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
