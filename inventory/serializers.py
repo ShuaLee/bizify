@@ -1,58 +1,50 @@
 from rest_framework import serializers
-from .models import Inventory, Item, ItemDetail, InventorySetting
-
-
-class ItemDetailSerializer(serializers.ModelSerializer):
-    key = serializers.CharField(source='setting.key', read_only=True)
-    type = serializers.CharField(source='setting.type', read_only=True)
-
-    class Meta:
-        model = ItemDetail
-        fields = ['key', 'type', 'value']
+from .models import Inventory, Item
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    details = ItemDetailSerializer(many=True, read_only=True)
-
-    def validate(self, data):
-        inventory = data.get(
-            'inventory', self.instance.inventory if self.instance else None)
-        if not inventory:
-            raise serializers.ValidationError("Inventory is required.")
-        settings = {s.key: s.allow_multiple for s in inventory.settings.all()}
-        details = self.initial_data.get('details', []
-                                        )
-        for detail in details:
-            key = detail.get('key')
+    def validate_details(self, value):
+        inventory = self.instance.inventory if self.instance else self.initial_data.get(
+            'inventory')
+        if isinstance(inventory, int):
+            inventory = Inventory.objects.get(id=inventory)
+        settings = inventory.settings
+        for key in value:
             if key not in settings:
                 raise serializers.ValidationError(
                     f"Key '{key}' not defined in inventory settings.")
-            value = detail.get('value')
-            if not settings[key] and isinstance(value, list):
+            if not settings[key].get('allow_multiple', False) and isinstance(value[key], list):
                 raise serializers.ValidationError(
-                    f"key '{key}' does not allow multiple values.")
-        return data
+                    f"Key '{key}' does not allow multiple values.")
+        return value
 
     class Meta:
         model = Item
         fields = ['id', 'inventory', 'name', 'description',
                   'quantity', 'details', 'created_at', 'updated_at']
-
-    class Meta:
-        model = Item
-        fields = ['id', 'inventory', 'name', 'description',
-                  'quantity', 'details', 'created_at', 'updated_at']
-
-
-class InventorySettingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = InventorySetting
-        fields = ['id', 'key', 'type', 'allow_multiple']
 
 
 class InventorySerializer(serializers.ModelSerializer):
+    VALUE_TYPES = (
+        ('text', 'Text'),
+        ('number', 'Number'),
+        ('url', 'URL'),
+        ('bool', 'Boolean'),
+    )
     items = ItemSerializer(many=True, read_only=True)
-    settings = InventorySettingSerializer(many=True, read_only=True)
+
+    def validate_settings(self, value):
+        for key, setting in value.items():
+            if 'type' not in setting:
+                raise serializers.ValidationError(
+                    f"Setting '{key}' must specify a 'type'.")
+            if setting['type'] not in dict(self.VALUE_TYPES):
+                raise serializers.ValidationError(
+                    f"Type '{setting['type']}' for '{key}' is not valid. Use: {', '.join(dict(self.VALUE_TYPES))}.")
+            if 'allow_multiple' not in setting:
+                raise serializers.ValidationError(
+                    f"Setting '{key}' must specify 'allow_multiple'.")
+        return value
 
     class Meta:
         model = Inventory

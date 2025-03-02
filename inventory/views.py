@@ -1,11 +1,27 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from .models import Inventory, Item, ItemDetail, InventorySetting
-from .serializers import InventorySerializer, ItemSerializer, ItemDetailSerializer, InventorySettingSerializer
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter
+from .models import Inventory, Item
+from .serializers import InventorySerializer, ItemSerializer
 
 # Create your views here.
+
+
+class ItemFilter(FilterSet):
+    # Custom filter for JSONField keys
+    details = CharFilter(method='filter_details')
+
+    def filter_details(self, queryset, name, value):
+        # Expect query param like ?details=part_no:ABC123
+        if ':' in value:
+            key, val = value.split(':', 1)
+            return queryset.filter(**{f'details__{key}': val})
+        return queryset
+
+    class Meta:
+        model = Item
+        fields = ['inventory', 'name', 'quantity']  # Direct fields
 
 
 class InventoryViewSet(ModelViewSet):
@@ -17,16 +33,6 @@ class ItemViewSet(ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = {'details__setting__key': [
-        'exact'], 'details__value': ['exact', 'gt', 'lt', 'contains']}
-    ordering_fields = ['details__value', 'name', 'quantity']
-
-
-class ItemDetailViewSet(ModelViewSet):
-    queryset = ItemDetail.objects.all()
-    serializer_class = ItemDetailSerializer
-
-
-class InventorySettingViewSet(ModelViewSet):
-    queryset = InventorySetting.objects.all()
-    serializer_class = InventorySettingSerializer
+    filterset_class = ItemFilter  # Use custom filter
+    # Limited to direct fields for simplicity
+    ordering_fields = ['name', 'quantity']

@@ -8,32 +8,15 @@ class Inventory(models.Model):
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, related_name='inventories')
     name = models.CharField(max_length=150)
+    settings = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Format: {'key': {'type': 'text|number|url|bool', 'allow_multiple': true|false}}"
+    )
     created_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} ({self.company.name})"
-
-
-class InventorySetting(models.Model):
-    VALUE_TYPES = (
-        ('text', 'Text'),
-        ('number', 'Number'),
-        ('url', 'URL'),
-        ('bool', 'Boolean'),
-    )
-
-    inventory = models.ForeignKey(
-        Inventory, on_delete=models.CASCADE, related_name="settings")
-    key = models.CharField(max_length=50)
-    type = models.CharField(max_length=10, choices=VALUE_TYPES, default='text')
-    allow_multiple = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.key} ({self.type}) - {self.inventory.name}"
-
-    class Meta:
-        # One setting per key per inventory
-        unique_together = ('inventory', 'key')
 
 
 class Item(models.Model):
@@ -42,22 +25,13 @@ class Item(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True)
     quantity = models.PositiveIntegerField(default=0)
+    details = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Key-value pairs matching inventory settings (e.g., {'part_no': 'ABC123', 'price': '5.99'})"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} ({self.inventory.name})"
-
-
-class ItemDetail(models.Model):
-    item = models.ForeignKey(
-        Item, on_delete=models.CASCADE, related_name='details')
-    setting = models.ForeignKey(
-        InventorySetting, on_delete=models.CASCADE, related_name='item_details')
-    value = models.CharField(max_length=255, blank=True)
-
-    def __str__(self):
-        return f"{self.setting.key}: {self.value} ({self.item.name})"
-
-    class Meta:
-        unique_together = ('item', 'setting')

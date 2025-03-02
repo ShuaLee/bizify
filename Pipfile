@@ -12,6 +12,7 @@ djoser = "*"
 djangorestframework-simplejwt = "*"
 drf-nested-routers = "*"
 django-filter = "*"
+django-json-widget = "*"
 
 [dev-packages]
 
