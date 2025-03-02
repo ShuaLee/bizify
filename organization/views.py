@@ -15,7 +15,7 @@ class ProfileViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, Destr
     #   return Profile.objects.filter(user=self.request.user)
 
 
-class CompanyViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+class CompanyViewSet(ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     # No permission_classes = [isAuthenticated] for now
