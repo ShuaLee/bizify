@@ -26,7 +26,8 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ['id', 'name', 'description', 'profiles']
+        fields = ['id', 'name', 'description', 'profiles',
+                  'country', 'is_active', 'created_at']
 
     def get_profiles(self, obj):
         # Fetch profiles linked to the company via ProfileCompanyRole
